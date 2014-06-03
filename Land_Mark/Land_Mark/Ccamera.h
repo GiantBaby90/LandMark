@@ -18,9 +18,9 @@ private:
 
 public:
 	Ccamera(){
-		fovy=65.0;	  aspect=1.0f;	  zNeer=0.1f;	  zFar=1000.f;
-		eye.x=0.0f;	eye.y=0.0f;	eye.z=300.0f;
-		center.x =400.0f;	center.y = 400.0f;	center.z = 000.0f;
+		fovy=65.0;	  aspect=0.25f;	  zNeer=0.1f;	  zFar=2500.f;
+		eye.x=0.0f;	eye.y=0.0f;	eye.z=600.0f;
+		center.x = 400.0f;	center.y = 400.0f;	center.z = 000.0f;
 		up.x = 1.0f;	up.y = 1.0f;	up.z = 1.0f;
 	}
 

@@ -8,7 +8,7 @@
 #define WIDTH_HARF_LENGHT 256
 #define DEPTH 0.5
 
-#define HEIGHT 600
+#define HEIGHT 800
 
 class CMipMap
 {
@@ -41,8 +41,8 @@ public:
 	void GenerateIndex(CFrustum& pFrustum, float fLODRatio);
 	void Draw();
 
-	bool levelUp(const Point& p);
-	bool levelDown(const Point& p);
+	Point levelUp(const Point& p);
+	Point levelDown(const Point& p);
 
 	int getCurrentLevel();
 };

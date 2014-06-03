@@ -41,7 +41,7 @@ bool CSingleLevelMap::openFile(DIRECTION dir)
 	strcat(local, fileName);	
 	swprintf_s(convert, L"%hs", local);
 
-	URLDownloadToFile ( NULL, server, convert, 0, NULL );
+//	URLDownloadToFile ( NULL, server, convert, 0, NULL );
 	
 	if(access(local, 0) == 0 && !geoMaps[(int) dir]->openFile(local)) //고도 데이터가 존재하지 않을 경우
 		map_load = false;
@@ -63,7 +63,7 @@ bool CSingleLevelMap::openFile(DIRECTION dir)
 		strcat(local, fileName);	
 		swprintf_s(convert, L"%hs", local);
 
-		URLDownloadToFile ( NULL, server, convert, 0, NULL );
+//		URLDownloadToFile ( NULL, server, convert, 0, NULL );
 
 		if(access(local, 0) == 0 && !temp.openFile(local))
 		{

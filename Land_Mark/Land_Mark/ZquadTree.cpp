@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cmath>
 
-#define MIN_SIZE 4
+#define MIN_SIZE 2
 
 ZQuadTree::ZQuadTree(int cx, int cy)
 {

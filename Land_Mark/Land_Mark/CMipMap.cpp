@@ -1,5 +1,6 @@
 #include "CMipMap.h"
 
+
 CMipMap::CMipMap(int level)
 {
 	currentLevel = level;
@@ -7,13 +8,13 @@ CMipMap::CMipMap(int level)
 	for(int i = 0; i < 3; i++)
 		geoMap[i] = new CSingleLevelMap(level - 1 + i);
 
-	leftBottomPosition[NORTH].y = leftBottomPosition[NORTH_WEST].y = leftBottomPosition[NORTH_EAST].y = WIDTH_HARF_LENGHT-10;
-	leftBottomPosition[NORTH_EAST].x = leftBottomPosition[EAST].x = leftBottomPosition[SOUTH_EAST].x = WIDTH_HARF_LENGHT-10;
+	leftBottomPosition[NORTH].y = leftBottomPosition[NORTH_WEST].y = leftBottomPosition[NORTH_EAST].y = WIDTH_HARF_LENGHT -10;
+	leftBottomPosition[NORTH_EAST].x = leftBottomPosition[EAST].x = leftBottomPosition[SOUTH_EAST].x = WIDTH_HARF_LENGHT;//-10;
 
 	leftBottomPosition[CUR].x = leftBottomPosition[NORTH].x = leftBottomPosition[SOUTH].x = -WIDTH_HARF_LENGHT;
 	leftBottomPosition[WEST].y = leftBottomPosition[CUR].y = leftBottomPosition[EAST].y = -WIDTH_HARF_LENGHT;
 
-	leftBottomPosition[WEST].x = leftBottomPosition[NORTH_WEST].x = leftBottomPosition[SOUTH_WEST].x = -WIDTH_HARF_LENGHT * 3 + 10;
+	leftBottomPosition[WEST].x = leftBottomPosition[NORTH_WEST].x = leftBottomPosition[SOUTH_WEST].x = -WIDTH_HARF_LENGHT * 3;// + 10;
 	leftBottomPosition[SOUTH_WEST].y = leftBottomPosition[SOUTH].y = leftBottomPosition[SOUTH_EAST].y = -WIDTH_HARF_LENGHT * 3 + 10;
 
 	currentImage = geoMap[CURRENT_LEVEL]->getCurrentImage();
@@ -82,17 +83,17 @@ void CMipMap::_drawMaps(unsigned int texture_id, std::vector<Point> &vertexArray
 	{
 //		glColor3f(1.0,0.0,0.0);
 		glTexCoord2d((double)iter->x/nXSize, (double)iter->y/nYSize);
-		glVertex3f(bottomLeft.x + iter->x, bottomLeft.y + iter->y, heightMap.getPosition(iter->x, iter->y) * DEPTH);
+		glVertex3f(bottomLeft.x + iter->x, bottomLeft.y + iter->y, heightMap.getPosition(iter->x, iter->y) * DEPTH * (currentLevel + 1));
 		iter++;
 
 //		glColor3f(0.0,1.0,0.0);
 		glTexCoord2d((double)iter->x/nXSize, (double)iter->y/nYSize);
-		glVertex3f(bottomLeft.x + iter->x, bottomLeft.y + iter->y, heightMap.getPosition(iter->x, iter->y) * DEPTH);
+		glVertex3f(bottomLeft.x + iter->x, bottomLeft.y + iter->y, heightMap.getPosition(iter->x, iter->y) * DEPTH * (currentLevel + 1));
 		iter++;
 
 //		glColor3f(0.0,0.0,1.0);
 		glTexCoord2d((double)iter->x/nXSize, (double)iter->y/nYSize);
-		glVertex3f(bottomLeft.x + iter->x, bottomLeft.y + iter->y, heightMap.getPosition(iter->x, iter->y) * DEPTH);
+		glVertex3f(bottomLeft.x + iter->x, bottomLeft.y + iter->y, heightMap.getPosition(iter->x, iter->y) * DEPTH * (currentLevel + 1));
 		iter++;
 	}
 	glEnd();
@@ -140,36 +141,39 @@ Point CMipMap::refresh(const Point& p)
 	return temp;
 }
 
-bool CMipMap::levelDown(const Point& p)
+Point CMipMap::levelDown(const Point& p)
 {
+	
 	CSingleLevelMap *temp = geoMap[POST_LEVEL];
 	geoMap[POST_LEVEL] = geoMap[CURRENT_LEVEL];
 	geoMap[CURRENT_LEVEL] = geoMap[PRE_LEVEL];
-	geoMap[PRE_LEVEL] = geoMap[POST_LEVEL];
+	geoMap[PRE_LEVEL] = temp;
 
-	Point currentImage = geoMap[CURRENT_LEVEL]->getCurrentImage();
+	currentImage = geoMap[CURRENT_LEVEL]->getCurrentImage();
 	currentLevel--;
 
 	geoMap[PRE_LEVEL]->removeAll();
 	geoMap[PRE_LEVEL]->setLevel(currentLevel-1);
 
-
 	geoMap[PRE_LEVEL]->setCurrentImage(Point(currentImage.x/2, currentImage.y/2));
 
+	bool *load_Image = geoMap[PRE_LEVEL]->getLoadImage();
 	for(int i = 0; i < DIRECTION_COUNT; i++)
-		geoMap[PRE_LEVEL]->openFile((DIRECTION) i);
+		load_Image[i] = geoMap[PRE_LEVEL]->openFile((DIRECTION) i);
 
-	return true;
+	return Point(p.x/2, p.y/2);
 }
 
-bool CMipMap::levelUp(const Point& p)
+Point CMipMap::levelUp(const Point& p)
 {
+	
 	CSingleLevelMap *temp = geoMap[PRE_LEVEL];
 	geoMap[PRE_LEVEL] = geoMap[CURRENT_LEVEL];
 	geoMap[CURRENT_LEVEL] = geoMap[POST_LEVEL];
-	geoMap[POST_LEVEL] = geoMap[PRE_LEVEL];
+	geoMap[POST_LEVEL] = temp;
+	
 
-	Point currentImage = geoMap[CURRENT_LEVEL]->getCurrentImage();
+	currentImage = geoMap[CURRENT_LEVEL]->getCurrentImage();
 	currentLevel++;
 
 	geoMap[POST_LEVEL]->removeAll();
@@ -181,10 +185,11 @@ bool CMipMap::levelUp(const Point& p)
 
 	geoMap[POST_LEVEL]->setCurrentImage(tempPoint);
 
+	bool *load_Image = geoMap[POST_LEVEL]->getLoadImage();
 	for(int i = 0; i < DIRECTION_COUNT; i++)
-		geoMap[POST_LEVEL]->openFile((DIRECTION) i);
+		load_Image[i] = geoMap[POST_LEVEL]->openFile((DIRECTION) i);
 
-	return true;
+	return Point(p.x*2, p.y*2);
 }
 
 int CMipMap::getCurrentLevel()

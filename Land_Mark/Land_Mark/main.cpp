@@ -4,7 +4,6 @@
 #include "CMipMap.h"
 #include <iostream>
 
-
 ////
 
 CMipMap *map;
@@ -25,31 +24,36 @@ int prev_left=0;
 float rotx=0.0f,roty=0.0f,rotz=0.0f;
 
 void wheel(int wheel, int direction, int x, int y){
-	//std::cout << "wheel:  " << wheel << std::endl;
-	//std::cout << "direction: " << direction << std::endl;
-
+	
+	int level = map->getCurrentLevel();
 	Vertex e,c;
-
-
+	
 	e = camera.getEye();
 	c = camera.getCenter();
 
+	std::cout << "Level:  "	<<level <<std::endl;
+	std::cout << "wheel:  " << e.z << std::endl;
+	std::cout << "direction: " << direction << std::endl;
+
+	if(level == 2 && direction == -1 &&  e.z < 400) return;
+
 	if (direction < 0) //zoom in
 	{
-		const double ratio = 0.9;
+//		const double ratio = 0.9;
 
-		e.z *= ratio;
+//		e.z *= ratio;
 		//	c.x *= ratio;
 		//	c.y *= ratio;
-
+		e.z -= 10;
 	}
 	else if(direction > 0)//zomm out
 	{
-		const double ratio = 1.1;
+//		const double ratio = 1.1;
 
-		e.z *= ratio;
+//		e.z *= ratio;
 		//	c.x *= ratio;
 		//	c.y *= ratio;
+		e.z+=10;
 	}
 
 	camera.setEye(e);
@@ -168,7 +172,6 @@ void motion(int x,int y)
 		&rcurr_x, &rcurr_y, &rcurr_z);
 
 
-
 	//calc camera movement from(curr - prev)
 	double disp_x=(rcurr_x - rprev_x);
 	double disp_y=(rcurr_y - rprev_y);
@@ -221,14 +224,26 @@ void mydisplay()
 
 	int level = map->getCurrentLevel();
 
-	//if((HEIGHT >> level) > eye.z) map->levelUp(Point(eye.x, eye.y));
-	//if((HEIGHT >> (level-1)) < eye.z) map->levelDown(Point(eye.x, eye.y));
-
 	eye.x += p.x;
 	center.x += p.x;
 
 	eye.y += p.y;
-	center.y += p.y;	
+	center.y += p.y;
+
+	if(level < 2 && 400 > eye.z)
+	{
+		map->levelUp(Point(eye.x, eye.y));
+		eye.z = 600;
+	}
+
+	if(level > 0 && eye.z > 1200)
+	{
+		map->levelDown(Point(eye.x, eye.y));
+		eye.z = 800;
+	}
+
+	//if(level < 2 && (HEIGHT >> (level+1)) > eye.z) map->levelUp(Point(eye.x, eye.y));
+	//if(level > 0 && (HEIGHT >> (level-1)) < eye.z) map->levelDown(Point(eye.x, eye.y));
 
 	camera.setEye(eye);
 	camera.setCenter(center);
